@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <vector>
 #include <bitset>
+#include <chrono>
 
 // este es el código de huffman !!! funciona bien con archivos txt :D
 // para compilar g++ huffman.cpp -o huffman en la terminal. el nombre del archivo se edita desde el main, no se pone en la terminal.
@@ -133,7 +134,18 @@ int main() {
     archivo.close();
 
     Nodo* raiz;
+
+    // inicializar el reloj
+    auto inicio = std::chrono::high_resolution_clock::now();
+
     std::string textoCodificado = codificar(raiz, texto);
+
+    // detener el reloj
+    auto fin = std::chrono::high_resolution_clock::now();
+
+    // calcular tiempo de codificación
+    auto duracion = std::chrono::duration_cast<std::chrono::milliseconds>(fin - inicio);
+    std::cout << "Tiempo de codificacion: " << duracion.count() << " ms" << std::endl;
 
     // guarda el texto codificado como binarios
     std::ofstream archivoCodificado("archivo_codificado.txt", std::ios::binary);
