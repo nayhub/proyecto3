@@ -135,25 +135,39 @@ int main() {
     Nodo* raiz;
     std::string textoCodificado = codificar(raiz, texto);
 
-    std::ofstream archivoCodificado("archivo_codificado.txt");
-    archivoCodificado << textoCodificado;
+    // guarda el texto codificado como binarios
+    std::ofstream archivoCodificado("archivo_codificado.txt", std::ios::binary);
+    for (int i = 0; i < textoCodificado.size(); i += 8) {
+        std::bitset<8> bits(textoCodificado.substr(i, 8));
+        char byte = static_cast<char>(bits.to_ulong());
+        archivoCodificado.write(&byte, sizeof(byte));
+    }
     archivoCodificado.close();
 
-    // guarda el huffman en un archivoo
+    // guarla el huffman como archivo 
     std::string cadenaArbol;
     arbolACadena(raiz, cadenaArbol);
     std::ofstream archivoArbol("arbol_huffman.txt");
     archivoArbol << cadenaArbol;
     archivoArbol.close();
 
-    // carga el huffman desde un archivo
+    // carga el huffman desde un archivo 
     std::ifstream archivoArbolIn("arbol_huffman.txt");
     std::string cadenaArbolIn((std::istreambuf_iterator<char>(archivoArbolIn)), std::istreambuf_iterator<char>());
     archivoArbolIn.close();
     int indice = 0;
     Nodo* raizIn = cadenaAArbol(cadenaArbolIn, indice);
 
-    std::string textoDecodificado = decodificar(raizIn, textoCodificado);
+    // carga el texto como datos binarios
+    std::ifstream archivoCodificadoIn("archivo_codificado.txt", std::ios::binary);
+    std::string textoCodificadoIn;
+    char byte;
+    while (archivoCodificadoIn.read(&byte, sizeof(byte))) {
+        textoCodificadoIn += std::bitset<8>(byte).to_string();
+    }
+    archivoCodificadoIn.close();
+
+    std::string textoDecodificado = decodificar(raizIn, textoCodificadoIn);
 
     std::ofstream archivoDecodificado("archivo_decodificado.txt");
     archivoDecodificado << textoDecodificado;
